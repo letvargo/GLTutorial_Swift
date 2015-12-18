@@ -7,11 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		57933F651C224E40004906AA /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 57933F631C224E40004906AA /* Shader.fsh */; };
+		57933F661C224E40004906AA /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 57933F641C224E40004906AA /* Shader.vsh */; };
 		57DE1A3A1C223591004CA3B0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE1A391C223591004CA3B0 /* AppDelegate.swift */; };
 		57DE1A3C1C223592004CA3B0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 57DE1A3B1C223592004CA3B0 /* Assets.xcassets */; };
 		57DE1A3F1C223592004CA3B0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 57DE1A3D1C223592004CA3B0 /* MainMenu.xib */; };
 		57DE1A4A1C223592004CA3B0 /* GLTutorial_SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE1A491C223592004CA3B0 /* GLTutorial_SwiftTests.swift */; };
 		57DE1A551C223592004CA3B0 /* GLTutorial_SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE1A541C223592004CA3B0 /* GLTutorial_SwiftUITests.swift */; };
+		57DE1A631C22360A004CA3B0 /* GLTutorialController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE1A621C22360A004CA3B0 /* GLTutorialController.swift */; };
+		57DE1A651C224618004CA3B0 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57DE1A641C224618004CA3B0 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +36,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		57933F631C224E40004906AA /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
+		57933F641C224E40004906AA /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
 		57DE1A361C223591004CA3B0 /* GLTutorial_Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GLTutorial_Swift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		57DE1A391C223591004CA3B0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57DE1A3B1C223592004CA3B0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -43,6 +49,9 @@
 		57DE1A501C223592004CA3B0 /* GLTutorial_SwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GLTutorial_SwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		57DE1A541C223592004CA3B0 /* GLTutorial_SwiftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLTutorial_SwiftUITests.swift; sourceTree = "<group>"; };
 		57DE1A561C223592004CA3B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		57DE1A621C22360A004CA3B0 /* GLTutorialController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GLTutorialController.swift; sourceTree = "<group>"; };
+		57DE1A641C224618004CA3B0 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		57DE1A661C224829004CA3B0 /* GLTutorial_Swift-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GLTutorial_Swift-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57DE1A651C224618004CA3B0 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,9 +80,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		57933F671C224E47004906AA /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				57933F631C224E40004906AA /* Shader.fsh */,
+				57933F641C224E40004906AA /* Shader.vsh */,
+			);
+			name = Shaders;
+			sourceTree = "<group>";
+		};
 		57DE1A2D1C223591004CA3B0 = {
 			isa = PBXGroup;
 			children = (
+				57DE1A641C224618004CA3B0 /* OpenGL.framework */,
 				57DE1A381C223591004CA3B0 /* GLTutorial_Swift */,
 				57DE1A481C223592004CA3B0 /* GLTutorial_SwiftTests */,
 				57DE1A531C223592004CA3B0 /* GLTutorial_SwiftUITests */,
@@ -93,7 +113,10 @@
 		57DE1A381C223591004CA3B0 /* GLTutorial_Swift */ = {
 			isa = PBXGroup;
 			children = (
+				57933F671C224E47004906AA /* Shaders */,
 				57DE1A391C223591004CA3B0 /* AppDelegate.swift */,
+				57DE1A661C224829004CA3B0 /* GLTutorial_Swift-Bridging-Header.h */,
+				57DE1A621C22360A004CA3B0 /* GLTutorialController.swift */,
 				57DE1A3B1C223592004CA3B0 /* Assets.xcassets */,
 				57DE1A3D1C223592004CA3B0 /* MainMenu.xib */,
 				57DE1A401C223592004CA3B0 /* Info.plist */,
@@ -223,6 +246,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57933F661C224E40004906AA /* Shader.vsh in Resources */,
+				57933F651C224E40004906AA /* Shader.fsh in Resources */,
 				57DE1A3C1C223592004CA3B0 /* Assets.xcassets in Resources */,
 				57DE1A3F1C223592004CA3B0 /* MainMenu.xib in Resources */,
 			);
@@ -249,6 +274,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57DE1A631C22360A004CA3B0 /* GLTutorialController.swift in Sources */,
 				57DE1A3A1C223591004CA3B0 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -471,6 +497,7 @@
 				57DE1A5B1C223592004CA3B0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		57DE1A5C1C223592004CA3B0 /* Build configuration list for PBXNativeTarget "GLTutorial_SwiftTests" */ = {
 			isa = XCConfigurationList;
@@ -479,6 +506,7 @@
 				57DE1A5E1C223592004CA3B0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		57DE1A5F1C223592004CA3B0 /* Build configuration list for PBXNativeTarget "GLTutorial_SwiftUITests" */ = {
 			isa = XCConfigurationList;
@@ -487,6 +515,7 @@
 				57DE1A611C223592004CA3B0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
