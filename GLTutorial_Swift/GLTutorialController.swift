@@ -188,11 +188,15 @@ class GLTutorialController: NSObject {
     
     func loadBufferData() {
     
-        var vertexData: [Vertex] =
-        [ Vertex(position: (x: -0.5, y: -0.5, z: 0.0, w: 1.0), color: (r: 1.0, g: 0.0, b: 0.0, a: 1.0))
-        , Vertex(position: (x: -0.5, y: 0.5, z: 0.0, w: 1.0), color:(r: 0.0, g: 1.0, b: 0.0, a: 1.0))
-        , Vertex(position: (x: 0.5, y: 0.5, z: 0.0, w: 1.0), color: (r: 0.0, g: 0.0, b: 1.0, a: 1.0))
-        , Vertex(position: (x: 0.5, y: -0.5, z: 0.0, w: 1.0), color:(r: 1.0, g: 1.0, b: 1.0, a: 1.0)) ]
+        var vertexData = Vertices(
+            v1: Vertex( position:   (x: -0.5, y: -0.5, z:  0.0, w:  1.0),
+                        color:      (r:  1.0, g:  0.0, b:  0.0, a:  1.0)),
+            v2: Vertex( position:   (x: -0.5, y:  0.5, z:  0.0, w:  1.0),
+                        color:      (r:  0.0, g:  1.0, b:  0.0, a:  1.0)),
+            v3: Vertex( position:   (x:  0.5, y:  0.5, z:  0.0, w:  1.0),
+                        color:      (r:  0.0, g:  0.0, b:  1.0, a:  1.0)),
+            v4: Vertex( position:   (x:  0.5, y: -0.5, z:  0.0, w:  1.0),
+                        color:      (r:  1.0, g:  1.0, b:  1.0, a:  1.0)) )
         
         glGenVertexArrays(1, &vertexArrayObject)
         getError()
@@ -203,7 +207,7 @@ class GLTutorialController: NSObject {
         getError()
         glBindBuffer(UInt32(GL_ARRAY_BUFFER), vertexBuffer);
         getError()
-        glBufferData(UInt32(GL_ARRAY_BUFFER), 4 * sizeof(Vertex), vertexData, UInt32(GL_STATIC_DRAW));
+        glBufferData(UInt32(GL_ARRAY_BUFFER), 4 * sizeof(Vertex), &vertexData, UInt32(GL_STATIC_DRAW));
         getError()
 
         glEnableVertexAttribArray(GLuint(positionAttribute))
@@ -214,9 +218,9 @@ class GLTutorialController: NSObject {
         glVertexAttribPointer(GLuint(positionAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), nil)
         getError()
         
-        var offset = 4
-        glVertexAttribPointer(GLuint(colorAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), &offset)
+        glVertexAttribPointer(GLuint(colorAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), nil)
         getError()
+
     }
     
     func renderForTime(time: CVTimeStamp) {
@@ -299,4 +303,11 @@ class GLTutorialController: NSObject {
 struct Vertex {
     var position: (x: GLfloat, y: GLfloat, z: GLfloat, w: GLfloat)
     var color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
+}
+
+struct Vertices {
+    var v1: Vertex
+    var v2: Vertex
+    var v3: Vertex
+    var v4: Vertex
 }
