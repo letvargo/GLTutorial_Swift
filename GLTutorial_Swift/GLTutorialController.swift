@@ -6,11 +6,21 @@
 //  Copyright © 2015 letvargo. All rights reserved.
 //
 
+import Cocoa
 import CoreVideo.CVDisplayLink
 import OpenGL.GL3
-import GLKit
-import Cocoa
-import GLUT
+
+struct Vertex {
+    let position: (x: GLfloat, y: GLfloat, z: GLfloat, w: GLfloat)
+    let color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
+}
+
+struct Vertices {
+    let v1: Vertex
+    let v2: Vertex
+    let v3: Vertex
+    let v4: Vertex
+}
 
 class GLTutorialController: NSObject {
 
@@ -34,7 +44,6 @@ class GLTutorialController: NSObject {
     }
     
     override func awakeFromNib() {
-        print("Awake from Nib!")
         createOpenGLView()
         createOpenGLResources()
         createDisplayLink()
@@ -72,18 +81,14 @@ class GLTutorialController: NSObject {
         let displayID = CGMainDisplayID()
         let error = CVDisplayLinkCreateWithCGDisplay(displayID, &displayLink)
         
-        if error == kCVReturnSuccess {
-            print("success!")
-        }
-        
-        guard let _ = displayLink where kCVReturnSuccess == error else {
+        guard let dLink = displayLink where kCVReturnSuccess == error else {
             NSLog("Display Link created with error: %d", error)
             displayLink = nil
             return
         }
         
-        CVDisplayLinkSetOutputCallback(displayLink!, displayCallback, UnsafeMutablePointer<Void>(unsafeAddressOf(self)))
-        CVDisplayLinkStart(displayLink!)
+        CVDisplayLinkSetOutputCallback(dLink, displayCallback, UnsafeMutablePointer<Void>(unsafeAddressOf(self)))
+        CVDisplayLinkStart(dLink)
     }
     
     func loadShader() {
@@ -147,7 +152,6 @@ class GLTutorialController: NSObject {
             var source = try NSString(contentsOfFile: file, encoding: NSASCIIStringEncoding).cStringUsingEncoding(NSASCIIStringEncoding)
             
             shader = glCreateShader(type)
-            print("shader: \(shader)")
             getError()
             glShaderSource(shader, 1, &source, nil)
             getError()
@@ -187,7 +191,7 @@ class GLTutorialController: NSObject {
     }
     
     func loadBufferData() {
-    
+        
         var vertexData = Vertices(
             v1: Vertex( position:   (x: -0.5, y: -0.5, z:  0.0, w:  1.0),
                         color:      (r:  1.0, g:  0.0, b:  0.0, a:  1.0)),
@@ -217,8 +221,9 @@ class GLTutorialController: NSObject {
 
         glVertexAttribPointer(GLuint(positionAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), nil)
         getError()
+
+        glVertexAttribPointer(GLuint(colorAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), UnsafePointer<Void>(nil) + 16)
         
-        glVertexAttribPointer(GLuint(colorAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), nil)
         getError()
 
     }
@@ -298,16 +303,4 @@ class GLTutorialController: NSObject {
             }
         }
     }
-}
-
-struct Vertex {
-    var position: (x: GLfloat, y: GLfloat, z: GLfloat, w: GLfloat)
-    var color: (r: GLfloat, g: GLfloat, b: GLfloat, a: GLfloat)
-}
-
-struct Vertices {
-    var v1: Vertex
-    var v2: Vertex
-    var v3: Vertex
-    var v4: Vertex
 }

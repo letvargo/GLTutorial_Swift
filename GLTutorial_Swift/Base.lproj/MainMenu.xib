@@ -666,16 +666,15 @@
                 </menuItem>
             </items>
         </menu>
-        <window title="GLTutorial_Swift" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="888" height="533"/>
+        <window title="GLTutorial_Swift" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+            <rect key="contentRect" x="335" y="390" width="652" height="462"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="888" height="533"/>
+                <rect key="frame" x="0.0" y="0.0" width="652" height="462"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
-            <point key="canvasLocation" x="557" y="330.5"/>
+            <point key="canvasLocation" x="591" y="384"/>
         </window>
         <customObject id="6af-rb-GO3" customClass="GLTutorialController" customModule="GLTutorial_Swift" customModuleProvider="target">
             <connections>
