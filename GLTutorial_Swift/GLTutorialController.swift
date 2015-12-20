@@ -22,6 +22,12 @@ struct Vertices {
     let v4: Vertex
 }
 
+let displayCallback: CVDisplayLinkOutputCallback = { displayLink, inNow, inOutputTime, flagsIn, flagsOut, displayLinkContext in
+    let controller = unsafeBitCast(displayLinkContext, GLTutorialController.self)
+    controller.renderForTime(inOutputTime.memory)
+    return kCVReturnSuccess
+}
+
 class GLTutorialController: NSObject {
 
     @IBOutlet var window: NSWindow!
@@ -29,19 +35,13 @@ class GLTutorialController: NSObject {
 
     var displayLink: CVDisplayLink?
     
-    var shaderProgram: GLuint!
+    var shaderProgram: GLuint = 0
     var vertexArrayObject: GLuint = 0
     var vertexBuffer: GLuint = 0
 
-    var positionUniform: GLint!
-    var colorAttribute: GLint = 0
-    var positionAttribute: GLint = 0
-    
-    let displayCallback: CVDisplayLinkOutputCallback = { displayLink, inNow, inOutputTime, flagsIn, flagsOut, displayLinkContext in
-        let controller = unsafeBitCast(displayLinkContext, GLTutorialController.self)
-        controller.renderForTime(inOutputTime.memory)
-        return kCVReturnSuccess
-    }
+    var positionUniform: GLint = -1
+    var colorAttribute: GLint = -1
+    var positionAttribute: GLint = -1
     
     override func awakeFromNib() {
         createOpenGLView()
@@ -51,15 +51,14 @@ class GLTutorialController: NSObject {
     
     func createOpenGLView() {
         let pixelFormatAttributes: [NSOpenGLPixelFormatAttribute] =
-            [
-                NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
-                NSOpenGLPFAColorSize    , 24                           ,
-                NSOpenGLPFAAlphaSize    , 8                            ,
-                NSOpenGLPFADoubleBuffer ,
-                NSOpenGLPFAAccelerated  ,
-                NSOpenGLPFANoRecovery   ,
-                0
-                ].map { UInt32($0) }
+            [ NSOpenGLPFAOpenGLProfile  , NSOpenGLProfileVersion3_2Core
+            , NSOpenGLPFAColorSize      , 24
+            , NSOpenGLPFAAlphaSize      , 8
+            , NSOpenGLPFADoubleBuffer
+            , NSOpenGLPFAAccelerated
+            , NSOpenGLPFANoRecovery
+            , 0 ]
+            .map { UInt32($0) }
                 
         let pixelFormat = NSOpenGLPixelFormat(attributes: pixelFormatAttributes)
         
@@ -77,24 +76,11 @@ class GLTutorialController: NSObject {
         loadBufferData()
     }
     
-    func createDisplayLink() {
-        let displayID = CGMainDisplayID()
-        let error = CVDisplayLinkCreateWithCGDisplay(displayID, &displayLink)
-        
-        guard let dLink = displayLink where kCVReturnSuccess == error else {
-            NSLog("Display Link created with error: %d", error)
-            displayLink = nil
-            return
-        }
-        
-        CVDisplayLinkSetOutputCallback(dLink, displayCallback, UnsafeMutablePointer<Void>(unsafeAddressOf(self)))
-        CVDisplayLinkStart(dLink)
-    }
-    
     func loadShader() {
     
         guard let vShaderFile = NSBundle.mainBundle().pathForResource("Shader", ofType: "vsh")
-            , let fShaderFile = NSBundle.mainBundle().pathForResource("Shader", ofType: "fsh") else { return }
+            , let fShaderFile = NSBundle.mainBundle().pathForResource("Shader", ofType: "fsh")
+            else { return }
         
         let vertexShader = compileShaderOfType(GLenum(GL_VERTEX_SHADER), file: vShaderFile)
         let fragmentShader = compileShaderOfType(GLenum(GL_FRAGMENT_SHADER), file: fShaderFile)
@@ -116,7 +102,7 @@ class GLTutorialController: NSObject {
         
         linkProgram(shaderProgram)
 
-        positionUniform = glGetUniformLocation(shaderProgram, "p");
+        positionUniform = glGetUniformLocation(shaderProgram, "p")
         getError()
 
         if (positionUniform < 0) {
@@ -127,7 +113,7 @@ class GLTutorialController: NSObject {
         getError()
 
         if (colorAttribute < 0) {
-            print("Shader did not contain the 'colour' attribute.")
+            print("Shader did not contain the 'color' attribute.")
         }
         
         positionAttribute = glGetAttribLocation(shaderProgram, "position")
@@ -158,27 +144,27 @@ class GLTutorialController: NSObject {
             glCompileShader(shader)
             getError()
             
-//        #if defined(DEBUG)
-//            GLint logLength;
-//
-//            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
-//            GetError();
-//            if (logLength > 0)
-//            {
-//                GLchar *log = malloc((size_t)logLength);
-//                glGetShaderInfoLog(shader, logLength, &logLength, log);
-//                GetError();
-//                NSLog(@"Shader compilation failed with error:\n%s", log);
-//                free(log);
-//            }
-//        #endif
+            #if DEBUG
+
+                var logLength: GLint = 0
+
+                glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength)
+                getError()
+                if logLength > 0 {
+                    var log = malloc(size_t(logLength))
+                    glGetShaderInfoLog(shader, logLength, &logLength, log)
+                    getError()
+                    NSLog("Shader compilation failed with error:\n%s", log)
+                    free(log)
+                }
+            #endif
 
             var status: GLint = 0
             glGetShaderiv(shader, UInt32(GL_COMPILE_STATUS), &status)
-            
             getError()
+            
             if (0 == status) {
-                glDeleteShader(shader);
+                glDeleteShader(shader)
             getError()
                 print("Shader compilation failed for file \(file)")
             }
@@ -188,6 +174,33 @@ class GLTutorialController: NSObject {
             print("\(error)")
         }
         return shader
+    }
+    
+    func linkProgram(program: GLuint) {
+        glLinkProgram(program)
+        getError()
+        
+        #if DEBUG
+            
+            var logLength: GLint = 0
+            
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength)
+            getError()
+            if logLength > 0 {
+                var log = malloc(size_t(logLength))
+                glGetProgramInfoLog(program, logLength, &logLength, log)
+                getError()
+                NSLog("Shader program linking failed with error:\n%s", log)
+                free(log)
+            }
+        #endif
+        
+        var status: GLint = 0
+        glGetProgramiv(program, UInt32(GL_LINK_STATUS), &status)
+        getError()
+        if (0 == status) {
+            print("Failed to link shader program")
+        }
     }
     
     func loadBufferData() {
@@ -209,9 +222,9 @@ class GLTutorialController: NSObject {
 
         glGenBuffers(1, &vertexBuffer)
         getError()
-        glBindBuffer(UInt32(GL_ARRAY_BUFFER), vertexBuffer);
+        glBindBuffer(UInt32(GL_ARRAY_BUFFER), vertexBuffer)
         getError()
-        glBufferData(UInt32(GL_ARRAY_BUFFER), 4 * sizeof(Vertex), &vertexData, UInt32(GL_STATIC_DRAW));
+        glBufferData(UInt32(GL_ARRAY_BUFFER), 4 * sizeof(Vertex), &vertexData, UInt32(GL_STATIC_DRAW))
         getError()
 
         glEnableVertexAttribArray(GLuint(positionAttribute))
@@ -219,13 +232,26 @@ class GLTutorialController: NSObject {
         glEnableVertexAttribArray(GLuint(colorAttribute))
         getError()
 
-        glVertexAttribPointer(GLuint(positionAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), nil)
+        glVertexAttribPointer(GLuint(positionAttribute), 4, GLenum(GL_FLOAT), GLboolean(GL_FALSE), GLsizei(sizeof(Vertex)), nil)
         getError()
 
-        glVertexAttribPointer(GLuint(colorAttribute), 4, UInt32(GL_FLOAT), UInt8(GL_FALSE), GLsizei(sizeof(Vertex)), UnsafePointer<Void>(nil) + 16)
+        let offset = UnsafePointer<Void>() + sizeofValue(vertexData.v1.position)
+        glVertexAttribPointer(GLuint(colorAttribute), 4, GLenum(GL_FLOAT), GLboolean(GL_FALSE), GLsizei(sizeof(Vertex)), offset)
+        getError()
+    }
+    
+    func createDisplayLink() {
+        let displayID = CGMainDisplayID()
+        let error = CVDisplayLinkCreateWithCGDisplay(displayID, &displayLink)
         
-        getError()
-
+        guard let dLink = displayLink where kCVReturnSuccess == error else {
+            NSLog("Display Link created with error: %d", error)
+            displayLink = nil
+            return
+        }
+        
+        CVDisplayLinkSetOutputCallback(dLink, displayCallback, UnsafeMutablePointer<Void>(unsafeAddressOf(self)))
+        CVDisplayLinkStart(dLink)
     }
     
     func renderForTime(time: CVTimeStamp) {
@@ -237,10 +263,10 @@ class GLTutorialController: NSObject {
         glClear(UInt32(GL_COLOR_BUFFER_BIT))
         getError()
         
-        glUseProgram(shaderProgram);
+        glUseProgram(shaderProgram)
         getError()
 
-        let timeValue = GLfloat(time.videoTime) / GLfloat(time.videoTimeScale);
+        let timeValue = GLfloat(time.videoTime) / GLfloat(time.videoTimeScale)
         let p: [GLfloat] = [ 0.5 * sinf(timeValue), 0.5 * cosf(timeValue) ]
         glUniform2fv(positionUniform, 1, p)
         getError()
@@ -250,34 +276,6 @@ class GLTutorialController: NSObject {
         
         view.openGLContext?.flushBuffer()
     }
-    
-    func linkProgram(program: GLuint) {
-        glLinkProgram(program)
-        getError()
-        
-//        #if defined(DEBUG)
-//            GLint logLength;
-//            
-//            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-//            GetError();
-//            if (logLength > 0)
-//            {
-//                GLchar *log = malloc((size_t)logLength);
-//                glGetProgramInfoLog(program, logLength, &logLength, log);
-//                GetError();
-//                NSLog(@"Shader program linking failed with error:\n%s", log);
-//                free(log);
-//            }
-//        #endif
-        
-        var status: GLint = 0
-        glGetProgramiv(program, UInt32(GL_LINK_STATUS), &status);
-        getError()
-        if (0 == status) {
-            print("Failed to link shader program")
-        }
-    }
-
 
     func getError() {
         for (var error = Int32(glGetError()); error != GL_NO_ERROR; error = Int32(glGetError())) {
